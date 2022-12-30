@@ -1,0 +1,158 @@
+*nvim-journal* A Journal For Neovim Written In Lua
+
+==============================================================================
+CONTENTS                                                        *nvim-journal*
+
+  1. Introduction                       |nvim-journal-introduction|
+  2. Configuration                      |nvim-journal-configuration|
+  3. Commands                           |nvim-journal-commands|
+
+==============================================================================
+1. INTRODUCTION                                    *nvim-journal-introduction*
+
+Features
+
+    - Manage multiple different journals
+    - Support for different journal frequencies for each journal
+    - Support for custom frequencies
+    - Optional templates for new journal entries.
+
+==============================================================================
+2. CONFIGURATION                                  *nvim-journal-configuration*
+
+You must run the setup() function to initialize nvim-journal.
+
+setup() function takes one optional argument: configuration table. If omitted
+nvim-journal will be initialized with default configuration.
+
+Subsequent calls to setup will replace the previous configuration.
+
+>
+    require('nvim-journal').setup({
+      default = nil,
+      journals = {
+        ["journal"] = {
+          path = "~/Documents/Journal",
+          frequency = "daily",
+          filename = "%Y-%m-%d.md",
+          template = {
+            title = "# %a %b %d %T %Y\n\n",
+            entry = "## %H:%M\n\n",
+          },
+        },
+    })
+<
+
+Here is a list of the options available in the setup call:
+
+*nvim-journal.default*
+Set the default journal to open if no other journal is specified/found.
+  Type: `string`, Default: `nil`
+
+*nvim-journal.journals*
+A table of journal configurations, where the key is the name of the journal,
+and the value is the configuration for that journal.
+
+    *nvim-journal.journals.path*
+    Directory that the journal files should be created in. All files for the
+    journal will be created within this directory, and this is the directory
+    that is used when searching for journals within the current working
+    directory.
+      Type: `string`
+
+    *nvim-journal.journals.frequency*
+    Configure the frequency for the journal. Either set as a predefined
+    string, or as a custom function. Can be one of `daily`, `weekly`,
+    `monthly`, `yearly` or a function.
+      Type: `string` or `function(date, offset)`
+
+      The function is passed the entry date for journal, and an offset for
+      which entry to open. The offset is in terms of the full frequency (e.g.
+      the offset for a daily journal will be provided in terms of days, and
+      the offset for a weekly journal will be provided in terms of weeks).
+      e.g. >
+        frequency = function(current, offset)
+          current:setday(1)
+          return current:addmonths(offset)
+        end
+<
+
+    *nvim-journal.journals.filename*
+    The template for the filename for a new journal entry. This argument
+    supports date format strings, and will be formatted with the entry date.
+      Type: `string`
+
+    *nvim-journal.journals.template*
+    Add optional templates for the journal, which will automatically be added
+    to the journal entries as they are created/opened.
+      Type: `Table`, Default: `{}`
+
+        *nvim-journal.journals.template.title*
+        The template for the journal entry title, this will only be added once
+        when the file is initially created. The string value supports date
+        format strings and is formatted with the journal entry date.
+          Type: `string` or `function(date)`, Default: `nil`
+
+          The function is passed the journal entry date, and is expected to
+          return a string to insert into the buffer.
+
+        *nvim-journal.journals.template.entry*
+        The template for individual entry within a single journal entry file.
+        This template is added to the end of the file every time the journal
+        is opened (if it is not already present in the file). The string
+        supports date format strings, and is formatted with the current date
+        time.
+          Type: `string` or `function(date)`, Default: `nil`
+
+          The function is passed the current date, and is expected to
+          return a string to append to the buffer.
+
+==============================================================================
+3. COMMANDS                                            *nvim-journal-commands*
+
+:JournalOpen {date}
+:JournalOpen {date} {journal}
+
+    Open a journal at a given specifc date. Optionally specify a journal to
+    open. Given a specific date, it will find the active entry for the
+    journal's frequency at that date and open that entry.
+
+    If no journal is specified, it will first check for any journals within
+    the current directory, and then will attempt to open the configured
+    default journal.
+
+:JournalCurrent
+:JournalCurrent {journal}
+
+    Open the currently active entry for a journal. Optionally specify a
+    journal to open.
+
+    If no journal is specified, it will first check for any journals within
+    the current directory, and then will attempt to open the configured
+    default journal.
+
+:JournalNext
+:JournalNext {journal}
+
+    Open the next entry for a journal. Optionally specify a journal to open.
+    The "next entry" is the entry that will follow the currently active entry.
+    This is dependent on the frequency of the journal (e.g. for a daily
+    journal, the next entry will be for tomorrow. And for a weekly journal the
+    next entry will be for next week).
+
+    If no journal is specified, it will first check for any journals within
+    the current directory, and then will attempt to open the configured
+    default journal.
+
+:JournalPrevious
+:JournalPrevious {journal}
+
+    Open the previous entry for a journal. Optionally specify a journal to
+    open. The "previous entry" is the entry that preceeded the currently active
+    entry. This is dependent on the frequency of the journal (e.g. for a daily
+    journal, the previous entry will be for yesterday. And for a weekly journal the
+    previous entry will be for last week).
+
+    If no journal is specified, it will first check for any journals within
+    the current directory, and then will attempt to open the configured
+    default journal.
