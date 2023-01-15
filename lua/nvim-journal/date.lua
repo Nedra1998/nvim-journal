@@ -192,8 +192,7 @@ local function makedayfrc(h, r, s, t)
 end
 -- time from day fraction
 local function breakdayfrc(df)
-  return
-    mod(floor(df / TICKSPERHOUR), HOURPERDAY),
+  return mod(floor(df / TICKSPERHOUR), HOURPERDAY),
     mod(floor(df / TICKSPERMIN), MINPERHOUR),
     mod(floor(df / TICKSPERSEC), SECPERMIN),
     mod(df, TICKSPERSEC)
