@@ -138,7 +138,7 @@ M.open = function(name, offset)
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
     local buffer = table.concat(lines, "\n")
     local idx, _ = buffer:find(entry)
-    if start_index == nil then
+    if idx == nil then
       -- Append the header string if it is not already present
       vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, vim.fn.split(entry, "\n"))
 
