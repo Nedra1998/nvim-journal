@@ -11,7 +11,7 @@ manage journals in Neovim.
 - Manage multiple different journals
 - Support for different journal frequencies for each journal
 - Support for custom frequencies
-- Optional templates for new journal entries.
+- Optional templates to apply when creating or updating journal entries
 
 ## :zap: Requirements
 
@@ -48,8 +48,8 @@ require('nvim-journal').setup({
       frequency = "daily",
       filename = "%Y-%m-%d.md",
       template = {
-        title = "# %a %b %d %T %Y\n\n",
-        entry = "## %H:%M\n\n",
+        create = "# %a %b %d %T %Y\n\n",
+        update = "## %H:%M\n\n",
       },
     },
 })

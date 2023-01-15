@@ -98,16 +98,16 @@ M.open = function(name, offset)
   path = vim.fn.expand(path)
 
   -- Open the journal file
-  vim.cmd("e " .. path)
+  vim.cmd("edit " .. path)
 
-  -- Add title template
-  if journal.template ~= nil and journal.template.title ~= nil and vim.fn.glob(path) == "" then
+  -- Add create template
+  if journal.template ~= nil and journal.template.create ~= nil and vim.fn.glob(path) == "" then
     -- Format the title string
     local title = ""
-    if type(journal.template.title) == "string" then
-      title = entrydate:fmt(journal.template.title)
+    if type(journal.template.create) == "string" then
+      title = entrydate:fmt(journal.template.create)
     else
-      title = journal.template.title(entrydate)
+      title = journal.template.create(entrydate)
     end
 
     -- Write the title string into the buffer
@@ -122,15 +122,15 @@ M.open = function(name, offset)
     end
   end
 
-  -- Add entry template
-  if journal.template ~= nil and journal.template.entry ~= nil then
+  -- Add update template
+  if journal.template ~= nil and journal.template.update ~= nil then
     -- Format the entry header string
     local nowtime = date(false)
     local entry = ""
-    if type(journal.template.entry) == "string" then
-      entry = nowtime:fmt(journal.template.entry)
+    if type(journal.template.update) == "string" then
+      entry = nowtime:fmt(journal.template.update)
     else
-      entry = journal.template.entry(nowtime)
+      entry = journal.template.update(nowtime)
     end
 
     -- Check if the buffer contains the header
@@ -194,14 +194,14 @@ M.open_date = function(name, input)
   -- Open the journal file
   vim.cmd("e " .. path)
 
-  -- Add title template
-  if journal.template.title ~= nil and vim.fn.glob(path) == "" then
+  -- Add create template
+  if journal.template.create ~= nil and vim.fn.glob(path) == "" then
     -- Format the title string
     local title = ""
-    if type(journal.template.title) == "string" then
-      title = entrydate:fmt(journal.template.title)
+    if type(journal.template.create) == "string" then
+      title = entrydate:fmt(journal.template.create)
     else
-      title = journal.template.title(entrydate)
+      title = journal.template.create(entrydate)
     end
 
     -- Write the title string into the buffer

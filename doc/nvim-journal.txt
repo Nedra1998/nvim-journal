@@ -36,8 +36,8 @@ Subsequent calls to setup will replace the previous configuration.
           frequency = "daily",
           filename = "%Y-%m-%d.md",
           template = {
-            title = "# %a %b %d %T %Y\n\n",
-            entry = "## %H:%M\n\n",
+            create = "# %a %b %d %T %Y\n\n",
+            update = "## %H:%M\n\n",
           },
         },
     })
@@ -84,20 +84,19 @@ and the value is the configuration for that journal.
 
     *nvim-journal.journals.template*
     Add optional templates for the journal, which will automatically be added
-    to the journal entries as they are created/opened.
+    to the journal entries as they are created/updated.
       Type: `Table`, Default: `{}`
 
-        *nvim-journal.journals.template.title*
-        The template for the journal entry title, this will only be added once
-        when the file is initially created. The string value supports date
-        format strings and is formatted with the journal entry date.
+        *nvim-journal.journals.template.create*
+        A template for the journal entry, this will only be added once when the
+        file is initially created. The string value supports date format strings
+        and is formatted with the journal entry date.
           Type: `string` or `function(date)`, Default: `nil`
 
           The function is passed the journal entry date, and is expected to
           return a string to insert into the buffer.
 
-        *nvim-journal.journals.template.entry*
-        The template for individual entry within a single journal entry file.
+        *nvim-journal.journals.template.update*
         This template is added to the end of the file every time the journal
         is opened (if it is not already present in the file). The string
         supports date format strings, and is formatted with the current date
