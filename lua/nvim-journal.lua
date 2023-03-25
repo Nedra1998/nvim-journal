@@ -38,11 +38,11 @@ local function find_journal(name)
     -- Look up the specified name if present
     return M.config.journals[name]
   else
-    -- Look for any journals within the CWD
+    -- Look for any currently open journals
     local cwd = vim.fn.getcwd() .. PATHSEP
     for _, value in pairs(M.config.journals) do
       local path = vim.fn.expand(value.path) .. PATHSEP
-      if vim.startswith(path, cwd) then
+      if vim.startswith(cwd, path) then
         return value
       end
     end

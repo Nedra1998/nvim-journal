@@ -53,7 +53,7 @@ require('nvim-journal').setup({
 ```
 
 For a complete list of available configuration options see [:help
-nvim-journal-configuration](https://github.com/Nedra1998/nvim-journal/blob/master/doc/nvim-journal.txt).
+nvim-journal-configuration](https://github.com/Nedra1998/nvim-journal/blob/main/doc/nvim-journal.txt).
 
 Each option is documented in `:help nvim-journal.OPTION_NAME`. Nested options
 can be accessed by appending `.`., for example `:help
@@ -66,7 +66,7 @@ plugin is through the user commands or through the lua API.
 
 ### Commands
 
-See [:help nvim-journal-commands](https://github.com/Nedra1998/nvim-journal/blob/master/doc/nvim-journal.txt).
+See [:help nvim-journal-commands](https://github.com/Nedra1998/nvim-journal/blob/main/doc/nvim-journal.txt).
 
 | Command                         | Description                          |
 | ------------------------------- | ------------------------------------ |
