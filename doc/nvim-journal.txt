@@ -1,4 +1,4 @@
-*nvim-journal* A Journal For Neovim Written In Lua
+nvim-journal A Journal For Neovim Written In Lua
 
 ==============================================================================
 CONTENTS                                                        *nvim-journal*
