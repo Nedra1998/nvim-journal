@@ -45,6 +45,20 @@ end, {
     return keys
   end,
 })
+vim.api.nvim_create_user_command("JournalIndex", function(opts)
+  require("nvim-journal").open_index(opts.fargs[1])
+end, {
+  nargs = "?",
+  complete = function(ArgLead, _, _)
+    local keys = {}
+    for key in pairs(require("nvim-journal").config.journals) do
+      if vim.startswith(key, ArgLead) then
+        table.insert(keys, key)
+      end
+    end
+    return keys
+  end,
+})
 vim.api.nvim_create_user_command("JournalGenerateIndex", function(opts)
   require("nvim-journal").generate_index(opts.fargs[1])
 end, {

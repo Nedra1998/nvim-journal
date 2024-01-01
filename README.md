@@ -84,4 +84,5 @@ See [:help nvim-journal-commands](https://github.com/Nedra1998/nvim-journal/blob
 | `:JournalCurrent [journal]`       | Open a journal for the current entry      |
 | `:JournalNext [journal]`          | Open the next journal entry               |
 | `:JournalPrevious [journal]`      | Open the previous journal entry           |
+| `:JournalIndex [journal]`         | Open the journal index                    |
 | `:JournalGenerateIndex [journal]` | Generate/Update the index for the journal |

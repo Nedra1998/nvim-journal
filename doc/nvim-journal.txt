@@ -208,6 +208,11 @@ and the value is the configuration for that journal.
     the current directory, and then will attempt to open the configured
     default journal.
 
+:JournalIndex
+:JournalIndex {journal}
+
+    Open the index file for the journal. Optionally specify a journal to open.
+
 :JournalGenerateIndex
 :JournalGenerateIndex {journal}
 

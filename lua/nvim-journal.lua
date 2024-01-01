@@ -38,7 +38,7 @@ local DEFAULT_JOURNAL = {
     header = "# Journal Index\n\n",
     sort = "descending",
     entry = "%Y-%m-%d",
-    section = { "## %Y", "### %B" },
+    sections = { "## %Y", "### %B" },
   },
 }
 
@@ -74,6 +74,39 @@ local function find_journal(name)
   else
     return nil
   end
+end
+
+M.open_index = function(name)
+  -- Find the journal configuration
+  local journal = find_journal(name)
+  if journal == nil then
+    if name ~= nil then
+      vim.notify(
+        'Failed to find configuration for journal "' .. vim.inspect(name) .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    elseif M.config.default ~= nil then
+      vim.notify(
+        'Failed to find configuration for default journal "' .. M.config.default .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    else
+      vim.notify(
+        'Failed to find a journal within the working directory "' .. vim.fn.getcwd() .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    end
+    return
+  end
+
+  local index_path = vim.fn.join({ journal.path, journal.index.filename }, PATHSEP)
+  index_path = vim.fn.expand(index_path)
+
+  -- Open the journal file
+  vim.cmd("edit " .. index_path)
 end
 
 M.generate_index = function(name)
@@ -127,7 +160,7 @@ M.generate_index = function(name)
 
     -- Format the section string
     local first_section = true
-    for i, section in ipairs(journal.index.section) do
+    for i, section in ipairs(journal.index.sections) do
       local section_str = ""
       if type(section) == "string" then
         section_str = entrydate:fmt(section)
