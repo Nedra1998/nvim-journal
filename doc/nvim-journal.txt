@@ -39,6 +39,15 @@ Subsequent calls to setup will replace the previous configuration.
             create = "# %a %b %d %T %Y\n\n",
             update = "## %H:%M\n\n",
           },
+          index = {
+            filename = "README.md",
+            header = "# Journal Index\n\n",
+            sort = "descending",
+            entry = "%Y-%m-%d",
+            sections = {
+              "## %Y", "### %B, %Y"
+            },
+          },
         },
     })
 <
@@ -106,6 +115,49 @@ and the value is the configuration for that journal.
           The function is passed the current date, and is expected to
           return a string to append to the buffer.
 
+    *nvim-journal.journals.index*
+    Add optional settings for generating an index for the journal. This index
+    can be generated as a list of linkes to all the journal entries that
+    exist.
+      Type: `Table`, Default: `{}`
+
+        *nvim-journal.journals.index.filename*
+        The filename to write the index to. Note that currently this file will
+        be completely overwritten every time the index is updated, so it is
+        not recommended to include any other content in this file.
+          Type: `string`, Default: `README.md`
+
+        *nvim-journal.journals.index.header*
+        This is the header that will be added to the top of the index file. It
+        is not a template string, and so does not support date format strings.
+          Type: `string`, Default: `# Journal Index\n\n`
+
+        *nvim-journal.journals.index.sort*
+        Define the order that the entries should be sorted in. Can be either
+        be `ascending` or `descending`. `decnding` will sort the entries such
+        that the most recent entry is first.
+          Type: `string`, Default: `descending`.
+
+        *nvim-journal.journals.index.entry*
+        The template string to use for the link text of each entry. The string
+        supports date format placeholders, and is formatted with the entries
+        datetime.
+          Type: `string` or `function(date)`, Default: `%Y-%m-%d`
+
+          The function is passed the entries date, and is expected to
+          return a string to use for the link text.
+
+        *nvim-journal.journals.index.section*
+        A list of template strings to use as sections within the index. Each
+        section can either be a string, or a function. If it is a string, it
+        supports date format placeholders. The section string is formatted for
+        each entry in the journal, and the entries are then grouped toegether
+        if the section string is the same for each entry.
+          Type: `string[]` or `function(date)[]`, Default: `{"## %Y", "### %B"}`
+
+          The function is passed the entries date, and is expected to
+          return a string to use for the link text.
+
 ==============================================================================
 3. COMMANDS                                            *nvim-journal-commands*
 
@@ -155,3 +207,10 @@ and the value is the configuration for that journal.
     If no journal is specified, it will first check for any journals within
     the current directory, and then will attempt to open the configured
     default journal.
+
+:JournalGenerateIndex
+:JournalGenerateIndex {journal}
+
+    Generate an index for the journal. Optionally specify a journal to
+    generate the index for. The index will be generated based on the
+    configuration of |nvim-journal.journals.index|.

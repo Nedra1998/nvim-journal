@@ -28,31 +28,149 @@ M.config = {
   journals = {},
 }
 
+local DEFAULT_JOURNAL = {
+  path = ".",
+  filename = "%Y-%m-%d.md",
+  frequency = "daily",
+  template = nil,
+  index = {
+    filename = "README.md",
+    header = "# Journal Index\n\n",
+    sort = "descending",
+    entry = "%Y-%m-%d",
+    section = { "## %Y", "### %B" },
+  },
+}
+
 M.setup = function(args)
   M.current_journal = nil
   M.config = vim.tbl_deep_extend("force", M.config, args or {})
 end
 
 local function find_journal(name)
+  local j = nil
   if name ~= nil then
     -- Look up the specified name if present
-    return M.config.journals[name]
+    j = M.config.journals[name]
   else
     -- Look for any currently open journals
     local cwd = vim.fn.getcwd() .. PATHSEP
     for _, value in pairs(M.config.journals) do
       local path = vim.fn.expand(value.path) .. PATHSEP
       if vim.startswith(cwd, path) then
-        return value
+        j = value
+        break
       end
     end
 
     -- Look for the default journal if set
     if M.config.default ~= nil then
-      return M.config.journals[M.config.default]
+      j = M.config.journals[M.config.default]
     end
   end
-  return nil
+
+  if j ~= nil then
+    return vim.tbl_deep_extend("force", DEFAULT_JOURNAL, j)
+  else
+    return nil
+  end
+end
+
+M.generate_index = function(name)
+  -- Find the journal configuration
+  local journal = find_journal(name)
+  if journal == nil then
+    if name ~= nil then
+      vim.notify(
+        'Failed to find configuration for journal "' .. vim.inspect(name) .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    elseif M.config.default ~= nil then
+      vim.notify(
+        'Failed to find configuration for default journal "' .. M.config.default .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    else
+      vim.notify(
+        'Failed to find a journal within the working directory "' .. vim.fn.getcwd() .. '".',
+        vim.log.levels.WARN,
+        { title = PLUGIN }
+      )
+    end
+    return
+  end
+
+  -- List all files in the journal directory
+  local files = vim.fs.find(function(fname, _)
+    return fname:match(".*%.md$") and fname ~= journal.index.filename
+  end, { limit = math.huge, type = "file", path = journal.path })
+
+  -- Sort the files
+  table.sort(files, function(a, b)
+    if journal.index.sort == "descending" then
+      return a > b
+    end
+    return a < b
+  end)
+
+  -- Create the index file
+  local body = journal.index.header
+
+  local sections = {}
+
+  for _, file in ipairs(files) do
+    local basename = vim.fn.fnamemodify(file, ":t")
+    local filename = vim.fn.fnamemodify(file, ":t:r")
+    local entrydate = date(filename)
+
+    -- Format the section string
+    local first_section = true
+    for i, section in ipairs(journal.index.section) do
+      local section_str = ""
+      if type(section) == "string" then
+        section_str = entrydate:fmt(section)
+      else
+        section_str = section(entrydate)
+      end
+      if sections[i] ~= section_str then
+        if first_section and #sections ~= 0 then
+          body = body .. "\n"
+        end
+
+        first_section = false
+        sections[i] = section_str
+        body = body .. section_str .. "\n\n"
+      end
+    end
+
+    -- Format the title string
+    local title = ""
+    if type(journal.index.entry) == "string" then
+      title = entrydate:fmt(journal.index.entry)
+    else
+      title = journal.index.entry(entrydate)
+    end
+    -- Add the entry to the index
+    body = body .. "- [" .. title .. "](" .. basename .. ")\n"
+  end
+
+  -- Write the index file
+  local index_path = vim.fn.join({ journal.path, journal.index.filename }, PATHSEP)
+  index_path = vim.fn.expand(index_path)
+  local out = io.open(index_path, "w+")
+  if out == nil then
+    vim.notify(
+      'Failed to open index file "' .. index_path .. '" for writing.',
+      vim.log.levels.ERROR,
+      { title = PLUGIN }
+    )
+    return
+  end
+
+  out:write(body)
+  out:close()
 end
 
 M.open = function(name, offset)
